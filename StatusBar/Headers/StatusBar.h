@@ -18,7 +18,6 @@ std::uint32_t floorToOdd(double num) {
 	return floored;
 }
 
-
 std::int32_t cmd_columns = 0, cmd_rows = 0;
 
 static inline void calc_cmd_size(void) {
@@ -121,7 +120,7 @@ private:
 			if (std::floor(oldIndexPrc) == std::floor(indexPrc)) continue;
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(statusBarDelay));
-			system("cls");
+			clrscr();
 
 			int x = static_cast<int>((indexPrc * barBody.width) / 100);
 			if (x == barBody.width) x = barBody.width - 2;
@@ -147,6 +146,17 @@ private:
 			oldIndexPrc = indexPrc;
 		} while (indexPrc < 100);
     }
+
+	inline void clrscr() { // TODO: make it more efficient
+		DWORD Unused = 0;
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		COORD zerozeroc = { 0, 0 };
+		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+		DWORD Length = csbi.dwSize.X * csbi.dwSize.Y;
+		FillConsoleOutputCharacterW(GetStdHandle(STD_OUTPUT_HANDLE), ' ', Length, zerozeroc, &Unused);
+		FillConsoleOutputAttribute(GetStdHandle(STD_OUTPUT_HANDLE), csbi.wAttributes, Length, zerozeroc, &Unused);
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), zerozeroc);
+	}
 
 private:
 	const std::int64_t statusBarDelay;

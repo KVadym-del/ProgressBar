@@ -138,7 +138,6 @@
     <ClCompile Include="Test\test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BarBuf.h" />
     <ClInclude Include="Headers\StatusBar.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

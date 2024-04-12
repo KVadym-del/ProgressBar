@@ -1,4 +1,4 @@
-#include "../Headers/StatusBar.h"
+﻿#include "../Headers/StatusBar.h"
 
 int main(void)
 {

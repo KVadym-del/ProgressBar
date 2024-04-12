@@ -1,6 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include <Windows.h>
+#include <io.h>
+#include <fcntl.h>
 
 #include <cstdint>
 #include <iostream>
@@ -22,31 +24,32 @@ std::int32_t cmd_columns = 0, cmd_rows = 0;
 
 static inline void calc_cmd_size(void) {
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 	cmd_columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 	cmd_rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 }
 
+typedef struct BarSkin {
+	wchar_t cornerTL	= L'╔';
+	wchar_t cornerTR	= L'╗';
+	wchar_t cornerBL	= L'╚';
+	wchar_t cornerBR	= L'╝';
+	wchar_t top			= L'-'; 
+	wchar_t down		= L'-';
+	wchar_t leftRight	= L'|';
+	wchar_t unfinished	= L' ';
+	wchar_t finished	= L'█';
+} BarSkin;
+
 typedef struct BarBody {
 	inline BarBody(
+		const BarSkin& barSkin = BarSkin{},
 		std::uint32_t height = 3,
-		std::uint32_t width = floorToOdd(((static_cast<double>(80) * cmd_columns) / 100)),
-		wchar_t cornerTL	= L'/',
-		wchar_t cornerTR	= L'\\',
-		wchar_t topDown		= L'-',
-		wchar_t leftRight	= L'|',
-		wchar_t unfinished	= L' ',
-		wchar_t finished	= L'X'
+		std::uint32_t width = floorToOdd(((static_cast<double>(80) * cmd_columns) / 100))
 	) : 
+		barSkin(barSkin),
 		height(height), 
-		width(width), 
-		cornerTL(cornerTL), 
-		cornerTR(cornerTR), 
-		topDown(topDown), 
-		leftRight(leftRight), 
-		unfinished(unfinished), 
-		finished(finished)
+		width(width)
 	{
 		if (cmd_columns == 0)	throw std::exception("Error: cmd_columns uncalculated. Check if calc_cmd_size() called!");
 		if (cmd_rows == 0)		throw std::exception("Error: cmd_rows uncalculated. Check if calc_cmd_size() called!");
@@ -59,12 +62,7 @@ typedef struct BarBody {
 	std::uint32_t width;
 	std::uint32_t height;
 
-	wchar_t cornerTL;
-	wchar_t cornerTR;
-	wchar_t topDown;
-	wchar_t leftRight;
-	wchar_t unfinished;
-	wchar_t finished;
+	BarSkin barSkin;
 
 	std::unique_ptr<std::unique_ptr<wchar_t[]>[]> canvas = std::make_unique<std::unique_ptr<wchar_t[]>[]>(height);
 } BarBody;
@@ -80,15 +78,19 @@ public:
 		{
 			for (std::size_t x = 0; x < barBody.width; x++) 
 			{
-				if (y == 0 && x == 0)									{ barBody.canvas[y][x] = barBody.cornerTL; continue; }
-				if (y == 0 && x == barBody.width - 1)					{ barBody.canvas[y][x] = barBody.cornerTR; continue; }
-				if (y == barBody.height - 1 && x == 0)					{ barBody.canvas[y][x] = barBody.cornerTR; continue; }
-				if (y == barBody.height - 1 && x == barBody.width - 1)	{ barBody.canvas[y][x] = barBody.cornerTL; continue; }
+				if (y == 0 && x == 0)									{ barBody.canvas[y][x] = barBody.barSkin.cornerTL; continue; }
+				if (y == 0 && x == barBody.width - 1)					{ barBody.canvas[y][x] = barBody.barSkin.cornerTR; continue; }
+				if (y == barBody.height - 1 && x == 0)					{ barBody.canvas[y][x] = barBody.barSkin.cornerBL; continue; }
+				if (y == barBody.height - 1 && x == barBody.width - 1)	{ barBody.canvas[y][x] = barBody.barSkin.cornerBR; continue; }
 				
-				if ((y != 0 && y != barBody.height - 1) && (x == 0 || x == barBody.width - 1)) { barBody.canvas[y][x] = barBody.leftRight; continue; }
-				if ((x != 0 && x != barBody.width - 1) && (y == 0 || y == barBody.height - 1)) { barBody.canvas[y][x] = barBody.topDown; continue; }
+				if ((y != 0 && y != barBody.height - 1) && (x == 0 || x == barBody.width - 1)) 
+				{ barBody.canvas[y][x] = barBody.barSkin.leftRight; continue; }
+				if ((x != 0 && x != barBody.width - 1) && (y == 0 ))
+				{ barBody.canvas[y][x] = barBody.barSkin.top; continue; }
+				if ((x != 0 && x != barBody.width - 1) && (y == barBody.height - 1))
+				{ barBody.canvas[y][x] = barBody.barSkin.down; continue; }
 
-				barBody.canvas[static_cast<std::size_t>((static_cast<double>(y) / 2) + 0.5)][x] = barBody.unfinished;
+				barBody.canvas[static_cast<std::size_t>((static_cast<double>(y) / 2) + 0.5)][x] = barBody.barSkin.unfinished;
 			}
 		}
 	}
@@ -111,6 +113,7 @@ public:
 private:
     inline void print_thread(const double& index) 
     { 
+		_setmode(_fileno(stdout), _O_WTEXT);
 		const std::wostream oldWcout{ std::wcout.rdbuf() };
 
 		float indexPrc = static_cast<float>((index * 100) / max);
@@ -127,7 +130,7 @@ private:
 			auto barMiddle = static_cast<std::size_t>((static_cast<double>(barBody.height) / 2));
 			for (std::size_t startX = 1; startX <= x; startX++)
 			{
-				barBody.canvas[barMiddle][startX] = barBody.finished;
+				barBody.canvas[barMiddle][startX] = barBody.barSkin.finished;
 			}
 
 			for (std::uint32_t i = 0; i < barBody.height; ++i) {
@@ -147,7 +150,7 @@ private:
 		} while (indexPrc < 100);
     }
 
-	inline void clrscr() { // TODO: make it more efficient
+	inline void clrscr() {
 		DWORD Unused = 0;
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		COORD zerozeroc = { 0, 0 };

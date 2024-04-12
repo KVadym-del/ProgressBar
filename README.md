@@ -2,6 +2,8 @@
 
 A ***ProgressBar*** is a header only C++ library that provides a simple way to display a progress of the event or process through ***progress bar***.
 
+![ProgressBar.png](./ProgressBar.png)
+
 ## Usage
 
 Automatic way:
@@ -49,7 +51,13 @@ The `generate_man` method is used to generate the progress bar. The first parame
 
 The method returns a thread that should be joined at the end of the process.
 
-## Details
+## Castomization
+
+The ***ProgressBar*** library provides the ability to customize the progress bar. The following parameters can be customized:
+- `BarSkin` struct - the skin of the progress bar.
+- `statusBarDelay` variable - the delay of the update of the progress bar.
+
+## Project Details
 
 - To make the progress bar work correctly and not interrupt main thread, ***Progress Bar*** library generates a separate thread that is responsible for the progress bar. The main thread is responsible for the process that will be displayed in the progress bar.
 

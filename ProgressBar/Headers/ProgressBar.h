@@ -148,6 +148,7 @@ private:
 			}
 			oldIndexPrc = indexPrc;
 		} while (indexPrc < 100);
+		_setmode(_fileno(stdout), _O_TEXT);
     }
 
 	inline void clrscr() {

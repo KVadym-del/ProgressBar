@@ -22,8 +22,9 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{354500b5-51ab-4044-a28d-3850d523e744}</ProjectGuid>
-    <RootNamespace>StatusBar</RootNamespace>
+    <RootNamespace>ProgressBar</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>ProgressBar</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -138,7 +139,7 @@
     <ClCompile Include="Test\test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Headers\StatusBar.h" />
+    <ClInclude Include="Headers\ProgressBar.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,9 +1,9 @@
-﻿#include "../Headers/StatusBar.h"
+﻿#include "../Headers/ProgressBar.h"
 
 int main(void)
 {
 	calc_cmd_size();
-	StatusBar statusBar{ {} };
+	ProgressBar statusBar{ {} };
 	double var = 0;
 	std::wcout << "test\n";
 

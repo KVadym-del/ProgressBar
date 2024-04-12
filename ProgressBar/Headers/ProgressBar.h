@@ -67,10 +67,10 @@ typedef struct BarBody {
 	std::unique_ptr<std::unique_ptr<wchar_t[]>[]> canvas = std::make_unique<std::unique_ptr<wchar_t[]>[]>(height);
 } BarBody;
 
-class StatusBar 
+class ProgressBar 
 {
 public:
-	inline StatusBar(BarBody orgBarBody, std::int64_t statusBarDelay = 10)
+	inline ProgressBar(BarBody orgBarBody, std::int64_t statusBarDelay = 10)
 		: barBody(std::move(orgBarBody)),
 		statusBarDelay(statusBarDelay)
 	{
